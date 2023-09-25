@@ -131,7 +131,7 @@ namespace IC3 {
   class IC3 {
   public:
     IC3(Model & _model) :
-      verbose(0), random(false), model(_model), k(1), nextState(0),
+      verbose(0), random(false), openSat(false), model(_model), k(1), nextState(0),
       litOrder(), slimLitOrder(),
       numLits(0), numUpdates(0), maxDepth(1), maxCTGs(3),
       maxJoins(1<<20), micAttempts(3), cexState(0), nQuery(0), nCTI(0), nCTG(0),
@@ -188,6 +188,7 @@ namespace IC3 {
 
     int verbose; // 0: silent, 1: stats, 2: all
     bool random;
+    bool openSat;
 
     string stringOfLitVec(const LitVec & vec) {
       stringstream ss;
@@ -666,6 +667,20 @@ namespace IC3 {
 
     size_t cexState;  // beginning of counterexample trace
 
+    void addExtraUc(size_t level){
+      Frame & fr = frames[level];
+      LitVec latches;
+      for (VarVec::const_iterator i = model.beginLatches(); 
+           i != model.endLatches(); ++i) {
+        Minisat::lbool val = fr.consecution->modelValue(i->var());
+        if (val != Minisat::l_Undef) {
+          Minisat::Lit la = i->lit(val == Minisat::l_False);
+          latches.push_back(la);
+          
+        }
+      }
+    }
+
     // Process obligations according to priority.
     bool handleObligations(PriorityQueue obls) {
       while (!obls.empty()) {
@@ -674,8 +689,14 @@ namespace IC3 {
         LitVec core;
         size_t predi;
         // Is the obligation fulfilled?
-        if (consecution(obl.level, state(obl.state).latches, obl.state, 
-                        &core, &predi)) {
+        bool result = consecution(obl.level, state(obl.state).latches, obl.state, &core, &predi);
+        if(openSat){
+          //add all extra UCs of this SAT call to F_i
+          // get UCs from SAT solver
+
+          // add those UCs to F_i if i > 0
+        }
+        if (result) {
           // Yes, so generalize and possibly produce a new obligation
           // at a higher level.
           obls.erase(obli);
@@ -814,7 +835,7 @@ namespace IC3 {
       if (numUpdates) cout << ". Avg lits/cls: " << numLits / numUpdates << endl;
     }
 
-    friend bool check(Model &, int, bool, bool);
+    friend bool check(Model &, int, bool, bool, bool);
 
   };
 
@@ -841,7 +862,7 @@ namespace IC3 {
   }
 
   // External function to make the magic happen.
-  bool check(Model & model, int verbose, bool basic, bool random) {
+  bool check(Model & model, int verbose, bool basic, bool random, bool openSat) {
     if (!baseCases(model))
       return false;
     IC3 ic3(model);
@@ -852,6 +873,7 @@ namespace IC3 {
       ic3.maxCTGs = 0;
     }
     if (random) ic3.random = true;
+    if (openSat) ic3.openSat = true;
     bool rv = ic3.check();
     if (!rv && verbose > 1) ic3.printWitness();
     if (verbose) ic3.printStats();

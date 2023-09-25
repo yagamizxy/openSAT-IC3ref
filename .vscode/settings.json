@@ -1,0 +1,16 @@
+{
+    "files.associations": {
+        "*.py": "python",
+        "set": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "optional": "cpp",
+        "algorithm": "cpp",
+        "random": "cpp",
+        "istream": "cpp",
+        "numeric": "cpp",
+        "typeinfo": "cpp",
+        "string_view": "cpp",
+        "type_traits": "cpp"
+    }
+}
