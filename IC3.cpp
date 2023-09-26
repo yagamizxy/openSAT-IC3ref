@@ -690,12 +690,23 @@ namespace IC3 {
         size_t predi;
         // Is the obligation fulfilled?
         bool result = consecution(obl.level, state(obl.state).latches, obl.state, &core, &predi);
-        if(openSat){
-          //add all extra UCs of this SAT call to F_i
-          // get UCs from SAT solver
 
-          // add those UCs to F_i if i > 0
-        }
+        // if(openSat){
+        //   //add all extra UCs of this SAT call to F_i
+        //   // get UCs from SAT solver
+        //   Frame & fr = frames[obl.level];
+        //   for(int i = 0; i <  fr.consecution->order.size();i++){
+        //     LitVec tempUC;
+        //     for(int j = 0; j <  fr.consecution->order[i].size(); j++){
+        //       Minisat::Lit la = fr.consecution->order[i][j];
+        //       if(model.isLatch(la)) tempUC.push_back(la);
+        //     }
+        //     // add those UCs to F_i if i > 0
+        //     addCube(obl.level, tempUC, false, false);
+        //     tempUC.clear();
+        //   }
+        // }
+
         if (result) {
           // Yes, so generalize and possibly produce a new obligation
           // at a higher level.
@@ -794,7 +805,7 @@ namespace IC3 {
         }
         if (verbose > 1)
           cout << i << " " << ckeep << " " << cprop << " " << cdrop << endl;
-        if (fr.borderCubes.empty())
+        if (!openSat && fr.borderCubes.empty())
           return true;
       }
       // 3. simplify frames

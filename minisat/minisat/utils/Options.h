@@ -25,9 +25,9 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 #include <math.h>
 #include <string.h>
 
-#include "mtl/IntTypes.h"
-#include "mtl/Vec.h"
-#include "utils/ParseUtils.h"
+#include "minisat/mtl/IntTypes.h"
+#include "minisat/mtl/Vec.h"
+#include "minisat/utils/ParseUtils.h"
 
 namespace Minisat {
 
@@ -60,7 +60,7 @@ class Option
     struct OptionLt {
         bool operator()(const Option* x, const Option* y) {
             int test1 = strcmp(x->category, y->category);
-            return test1 < 0 || test1 == 0 && strcmp(x->type_name, y->type_name) < 0;
+            return test1 < 0 || (test1 == 0 && strcmp(x->type_name, y->type_name) < 0);
         }
     };
 
@@ -277,25 +277,25 @@ class Int64Option : public Option
         return true;
     }
 
-    virtual void help (bool verbose = false){
-        fprintf(stderr, "  -%-12s = %-8s [", name, type_name);
-        if (range.begin == INT64_MIN)
-            fprintf(stderr, "imin");
-        else
-            fprintf(stderr, "%4" PRIi64, range.begin);
+    // virtual void help (bool verbose = false){
+    //     fprintf(stderr, "  -%-12s = %-8s [", name, type_name);
+    //     if (range.begin == INT64_MIN)
+    //         fprintf(stderr, "imin");
+    //     else
+    //         fprintf(stderr, "%4"PRIi64, range.begin);
 
-        fprintf(stderr, " .. ");
-        if (range.end == INT64_MAX)
-            fprintf(stderr, "imax");
-        else
-            fprintf(stderr, "%4" PRIi64, range.end);
+    //     fprintf(stderr, " .. ");
+    //     if (range.end == INT64_MAX)
+    //         fprintf(stderr, "imax");
+    //     else
+    //         fprintf(stderr, "%4"PRIi64, range.end);
 
-        fprintf(stderr, "] (default: %" PRIi64")\n", value);
-        if (verbose){
-            fprintf(stderr, "\n        %s\n", description);
-            fprintf(stderr, "\n");
-        }
-    }
+    //     fprintf(stderr, "] (default: %"PRIi64")\n", value);
+    //     if (verbose){
+    //         fprintf(stderr, "\n        %s\n", description);
+    //         fprintf(stderr, "\n");
+    //     }
+    // }
 };
 #endif
 

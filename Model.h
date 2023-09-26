@@ -176,6 +176,12 @@ public:
     return vars.begin()+reps; 
   }
 
+  bool isLatch(Minisat::Lit lit){
+    Var litVar = varOfLit(lit);
+    if(litVar.index() >= beginLatches()->index() && litVar.index() < endLatches()->index()) return true;
+    return false;
+  }
+
   // Next-state function for given latch.
   Minisat::Lit nextStateFn(const Var & latch) const {
     assert (latch.index() >= latches && latch.index() < reps);
