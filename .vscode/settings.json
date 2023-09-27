@@ -11,6 +11,11 @@
         "numeric": "cpp",
         "typeinfo": "cpp",
         "string_view": "cpp",
-        "type_traits": "cpp"
+        "type_traits": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "vector": "cpp",
+        "unordered_map": "cpp",
+        "system_error": "cpp"
     }
 }

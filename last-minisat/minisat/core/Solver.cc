@@ -239,7 +239,7 @@ void Solver::cancelUntil(int level) {
         qhead = trail_lim[level];
         trail.shrink(trail.size() - trail_lim[level]);
         trail_lim.shrink(trail_lim.size() - level);
-    wrong.push_(trail);
+    //wrong.push_(trail);    
     } }
 
 

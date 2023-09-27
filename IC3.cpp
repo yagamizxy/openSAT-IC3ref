@@ -695,10 +695,10 @@ namespace IC3 {
         //   //add all extra UCs of this SAT call to F_i
         //   // get UCs from SAT solver
         //   Frame & fr = frames[obl.level];
-        //   for(int i = 0; i <  fr.consecution->order.size();i++){
+        //   for(int i = 0; i <  fr.consecution->wrong.size();i++){
         //     LitVec tempUC;
-        //     for(int j = 0; j <  fr.consecution->order[i].size(); j++){
-        //       Minisat::Lit la = fr.consecution->order[i][j];
+        //     for(int j = 0; j <  fr.consecution->wrong[i].size(); j++){
+        //       Minisat::Lit la = fr.consecution->wrong[i][j];
         //       if(model.isLatch(la)) tempUC.push_back(la);
         //     }
         //     // add those UCs to F_i if i > 0

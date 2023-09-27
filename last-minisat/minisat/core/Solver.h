@@ -122,7 +122,7 @@ public:
     vec<lbool> model;             // If problem is satisfiable, this vector contains the model (if any).
     LSet       conflict;          // If problem is unsatisfiable (possibly under assumptions),
                                   // this vector represent the final conflict clause expressed in the assumptions.
-    vec<vec<Lit>>   wrong;    // <iteration, contridicted assignment>
+    vec<vec<Lit>>       wrong;    // <iteration, contridicted assignment>
     // Mode of operation:
     //
     int       verbosity;
