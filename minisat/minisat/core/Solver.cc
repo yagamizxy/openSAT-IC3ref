@@ -19,7 +19,8 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 **************************************************************************************************/
 
 #include <math.h>
-
+#include <vector>
+#include <iostream>
 #include "minisat/mtl/Alg.h"
 #include "minisat/mtl/Sort.h"
 #include "minisat/utils/System.h"
@@ -101,7 +102,9 @@ Solver::Solver() :
   , conflict_budget    (-1)
   , propagation_budget (-1)
   , asynch_interrupt   (false)
-{}
+{
+    trail_record.resize(1);
+}
 
 
 Solver::~Solver()
@@ -229,6 +232,18 @@ bool Solver::satisfied(const Clause& c) const {
 // Revert to the state at given level (keeping all assignment at 'level' but not beyond).
 //
 void Solver::cancelUntil(int level) {
+    //trail_record.push_back(trail);
+    if (trail_record.size() <= iteration){                                     //size   1  1-2  
+        trail_record.resize(iteration + 2);                                    //ite    0  1    2
+    }
+    trail.copyTo(trail_record[iteration]);
+    std::cout<<"print trail: "<<std::endl;
+    for(int i = 0; i < trail_record[iteration].size(); ++i){
+        std::cout<<trail_record[iteration][i].x<<" ";
+        //wrong.push_back(trail[i].x);
+    }
+    std::cout<<std::endl;
+    iteration = iteration + 1;
     if (decisionLevel() > level){
         for (int c = trail.size()-1; c >= trail_lim[level]; c--){
             Var      x  = var(trail[c]);
@@ -239,7 +254,6 @@ void Solver::cancelUntil(int level) {
         qhead = trail_lim[level];
         trail.shrink(trail.size() - trail_lim[level]);
         trail_lim.shrink(trail_lim.size() - level);
-    wrong.push_(trail);
     } }
 
 
@@ -489,7 +503,7 @@ void Solver::uncheckedEnqueue(Lit p, CRef from)
     assert(value(p) == l_Undef);
     assigns[var(p)] = lbool(!sign(p));
     vardata[var(p)] = mkVarData(from, decisionLevel());
-    trail.push_(p);
+    trail.push_(p); 
 }
 
 
@@ -841,7 +855,6 @@ lbool Solver::solve_()
 {
     model.clear();
     conflict.clear();
-    wrong.clear();
     if (!ok) return l_False;
 
     solves++;

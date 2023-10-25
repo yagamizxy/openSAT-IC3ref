@@ -20,7 +20,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 #ifndef Minisat_Solver_h
 #define Minisat_Solver_h
-
+#include <vector>
 #include "minisat/mtl/Vec.h"
 #include "minisat/mtl/Heap.h"
 #include "minisat/mtl/Alg.h"
@@ -122,7 +122,8 @@ public:
     vec<lbool> model;             // If problem is satisfiable, this vector contains the model (if any).
     LSet       conflict;          // If problem is unsatisfiable (possibly under assumptions),
                                   // this vector represent the final conflict clause expressed in the assumptions.
-    vec<vec<Lit>>   wrong;    // <iteration, contridicted assignment>
+    std::vector <Minisat::vec<Minisat::Lit>> trail_record;
+    int iteration = 0;
     // Mode of operation:
     //
     int       verbosity;

@@ -479,6 +479,12 @@ namespace IC3 {
         assumps[i] = model.primeLit(assumps[i]);
       fr.consecution->addClause_(cls);
       // F_fi & ~latches & T & latches'
+
+      // std::cout<<"print assumps: "<<std::endl;
+      // for(int i = 0; i < assumps.size(); ++i)
+      //   std::cout<<assumps[i].x<<" ";
+      // std::cout<<std::endl;
+      
       ++nQuery; startTimer();  // stats
       bool rv = fr.consecution->solve(assumps);
       endTimer(satTime);
@@ -706,6 +712,15 @@ namespace IC3 {
         //     tempUC.clear();
         //   }
         // }
+
+        /*
+        std::cout<<"print trail: "<<std::endl;
+        for(int i = 1; i < trail.size(); ++i){
+            std::cout<<trail[i].x<<" ";
+            //wrong.push_back(trail[i].x);
+        }
+        std::cout<<std::endl;
+        */
 
         if (result) {
           // Yes, so generalize and possibly produce a new obligation
