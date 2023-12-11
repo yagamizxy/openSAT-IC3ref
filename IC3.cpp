@@ -24,6 +24,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <algorithm>
 #include <iostream>
 #include <set>
+#include <vector>
 #include <sys/times.h>
 
 #include "IC3.h"
@@ -166,7 +167,7 @@ namespace IC3 {
         if (verbose > 1) cout << "Level " << k << endl;
         extend();                         // push frontier frame
         if (!strengthen()) return false;  // strengthen to remove bad successors
-        if (propagate()) return true;     // propagate clauses; check for proof
+        //if (propagate()) return true;     // propagate clauses; check for proof
         printStats();
         ++k;                              // increment frontier
       }
@@ -687,6 +688,10 @@ namespace IC3 {
       }
     }
 
+    static bool map_cmp(std::pair<int, int>& a, std::pair<int, int>& b){
+      return a.second > b.second;
+    }
+
     // Process obligations according to priority.
     bool handleObligations(PriorityQueue obls) {
       while (!obls.empty()) {
@@ -696,22 +701,6 @@ namespace IC3 {
         size_t predi;
         // Is the obligation fulfilled?
         bool result = consecution(obl.level, state(obl.state).latches, obl.state, &core, &predi);
-
-        // if(openSat){
-        //   //add all extra UCs of this SAT call to F_i
-        //   // get UCs from SAT solver
-        //   Frame & fr = frames[obl.level];
-        //   for(int i = 0; i <  fr.consecution->wrong.size();i++){
-        //     LitVec tempUC;
-        //     for(int j = 0; j <  fr.consecution->wrong[i].size(); j++){
-        //       Minisat::Lit la = fr.consecution->wrong[i][j];
-        //       if(model.isLatch(la)) tempUC.push_back(la);
-        //     }
-        //     // add those UCs to F_i if i > 0
-        //     addCube(obl.level, tempUC, false, false);
-        //     tempUC.clear();
-        //   }
-        // }
 
         /*
         std::cout<<"print trail: "<<std::endl;
@@ -740,6 +729,43 @@ namespace IC3 {
           // No, so focus on predecessor.
           obls.insert(Obligation(predi, obl.level-1, obl.depth+1));
         }
+
+        if( obl.level > 0 && openSat){
+          //add all extra UCs of this SAT call to F_i
+          // get UCs from SAT solver
+          Frame & fr = frames[obl.level];
+          //std::cout<<"generate trail UC number : "<<fr.consecution->trail_record.size()<<std::endl;
+
+          // sort the trail map by the taril_uc size, add the shortest 3 ones into the frame
+          std::vector<pair<int, int> > trail_length_ind_map;
+          for(int i = 0; i <  fr.consecution->trail_record.size();i++){
+            trail_length_ind_map.push_back(pair<int, int>(i, fr.consecution->trail_record[i].size()));
+          }
+          std::sort(trail_length_ind_map.begin(), trail_length_ind_map.end(), map_cmp);
+          int add_to_frame_num = (fr.consecution->trail_record.size() < 3) ? fr.consecution->trail_record.size() : 3;
+          //int mid_ind = fr.consecution->trail_record.size() / 2;
+          //for(int i = mid_ind - 1; i > 0 && i < mid_ind + add_to_frame_num - 1 && i < fr.consecution->trail_record.size();i++){
+          for(int i = 0; i < add_to_frame_num; i++){
+            int tempIndex = trail_length_ind_map[i].first;
+            //std::cout<<"taril map : "<<i<<", "<<trail_length_ind_map[i].first<<", "<<trail_length_ind_map[i].second<<std::endl;
+            LitVec tempUC;
+            for(int j = 0; j <  fr.consecution->trail_record[tempIndex].size(); j++){
+              Minisat::Lit la = fr.consecution->trail_record[tempIndex][j];
+              if(model.isLatch(la)) tempUC.push_back(la);
+            }
+            if(tempUC.size() > 0) addCube(obl.level, tempUC, false, false);
+            // if(tempUC.size() == 0)
+            //   std::cout<<"empty UC"<<endl;
+            // std::cout<<"add trail uc to Frame : "<<obl.level<<std::endl;
+            // for(int k = 0; k < tempUC.size(); k++){
+            //   std::cout<<tempUC[k].x<<" ";
+            // }
+            // std::cout<<std::endl;
+            // add those UCs to F_i if i > 0
+            tempUC.clear();
+          }
+          trail_length_ind_map.clear();
+        }
       }
       return true;
     }
@@ -756,6 +782,7 @@ namespace IC3 {
         ++nQuery; startTimer();  // stats
         bool rv = frontier.consecution->solve(model.primedError());
         endTimer(satTime);
+        //std::cout<<"rv : "<<rv<<std::endl;
         if (!rv) return true;
         // handle CTI with error successor
         ++nCTI;  // stats

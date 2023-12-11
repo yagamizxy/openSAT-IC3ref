@@ -39,6 +39,7 @@ template<class T, class _Size = int>
 class vec {
 public:
     typedef _Size Size;
+    typedef T value_type;
 private:
     T*   data;
     Size sz;
@@ -56,8 +57,13 @@ public:
     explicit vec(Size size)      : data(NULL), sz(0), cap(0)    { growTo(size); }
     vec(Size size, const T& pad) : data(NULL), sz(0), cap(0)    { growTo(size, pad); }
    //~vec()                                                       { clear(true); }
+    
     vec(const vec&) = delete;
     vec(vec&&) = default;
+
+
+
+
     // Pointer to first element:
     operator T*       (void)           { return data; }
 

@@ -29,6 +29,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 #include <sstream>
 #include <unordered_map>
 #include <vector>
+#include <iostream>
 
 extern "C" {
 #include "aiger.h"
@@ -177,8 +178,13 @@ public:
   }
 
   bool isLatch(Minisat::Lit lit){
-    Var litVar = varOfLit(lit);
-    if(litVar.index() >= beginLatches()->index() && litVar.index() < endLatches()->index()) return true;
+    // std::cout<<"vars size: "<<vars.size()<<endl;
+    // std::cout<<"literal: ";
+    // std::cout<<lit.x<<endl;
+    int litVar = lit.x >> 1;
+    // Var litVar = varOfLit(lit);
+    // if(litVar.index() >= beginLatches()->index() && litVar.index() < endLatches()->index()) return true;
+    if(litVar >= beginLatches()->index() && litVar < endLatches()->index()) return true;
     return false;
   }
 

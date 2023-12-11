@@ -20,6 +20,7 @@ OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWA
 
 #include <math.h>
 #include <vector>
+#include <iostream>
 #include "minisat/mtl/Alg.h"
 #include "minisat/mtl/Sort.h"
 #include "minisat/utils/System.h"
@@ -231,16 +232,17 @@ bool Solver::satisfied(const Clause& c) const {
 // Revert to the state at given level (keeping all assignment at 'level' but not beyond).
 //
 void Solver::cancelUntil(int level) {
+    //trail_record.push_back(trail);
     if (trail_record.size() <= iteration){                                     //size   1  1-2  
         trail_record.resize(iteration + 2);                                    //ite    0  1    2
     }
     trail.copyTo(trail_record[iteration]);
-    // std::cout<<"print trail: "<<std::endl;
-    // for(int i = 0; i < trail_record[iteration].size(); ++i){
-    //     std::cout<<trail_record[iteration][i].x<<" ";
-    //     //wrong.push_back(trail[i].x);
-    // }
-    // std::cout<<std::endl;
+    std::cout<<"print trail: "<<std::endl;
+    for(int i = 0; i < trail_record[iteration].size(); ++i){
+        std::cout<<trail_record[iteration][i].x<<" ";
+        //wrong.push_back(trail[i].x);
+    }
+    std::cout<<std::endl;
     iteration = iteration + 1;
     if (decisionLevel() > level){
         for (int c = trail.size()-1; c >= trail_lim[level]; c--){
@@ -501,7 +503,7 @@ void Solver::uncheckedEnqueue(Lit p, CRef from)
     assert(value(p) == l_Undef);
     assigns[var(p)] = lbool(!sign(p));
     vardata[var(p)] = mkVarData(from, decisionLevel());
-    trail.push_(p);
+    trail.push_(p); 
 }
 
 
